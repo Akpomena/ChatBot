@@ -1,0 +1,28 @@
+body {
+    background-color: black;
+}
+
+h1 {
+    color: white;
+    text-align: center;
+}
+
+p {
+    color: white;
+}
+
+.bot {
+    text-align: right;
+    margin-right: 10px;
+}
+
+form input {
+    width: 100%;
+    border-radius: 5px;
+}
+
+form {
+    position: fixed;
+    bottom: 5px;
+    width: 100%;
+}

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Nero's Chatbot</title>
+
+</head>
+<body>
+
+    <h1>WELCOME TO MY CHAT BOT</h1>
+
+    <div id="chat">
+        
+    </div>
+
+    <form method="POST" action="new.cgi" onsubmit="return chat()">
+        <input type="text" name="prompt" id="prompt">
+        <input type="button" value="for voice" onclick="voice()">
+    </form>
+
+    <script>
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+        console.log('Speech recognition is not supported by this browser.');
+        } else {
+        const recognition = new SpeechRecognition();
+
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+
+            var textarea = document.getElementById("chat");
+            var tag = document.createElement("p");
+            tag.innerHTML = transcript;
+            textarea.appendChild(tag);
+           
+
+            const update = {
+                prompt: transcript,
+                };
+
+            const options = {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(update),
+                };
+
+                fetch('http://localhost:3000/api', options)
+                    .then(data => {
+                        if (!data.ok) {
+                            throw Error(data.status);
+                        }
+                        return data.json();
+                        }).then(update => {
+                            var textarea = document.getElementById("chat");
+                            var tag = document.createElement("p");
+                            tag.innerHTML = update;
+                            tag.classList = "bot";
+                            textarea.appendChild(tag);
+
+                            // check if the browser supports speech synthesis
+                                if ('speechSynthesis' in window) {
+                                
+                                // create a new SpeechSynthesisUtterance object
+                                var msg = new SpeechSynthesisUtterance();
+                                
+                                // set the text to be spoken
+                                msg.text = update;
+                                
+                                // speak the text
+                                window.speechSynthesis.speak(msg);
+                                }
+
+
+                        }).catch(e => {
+                        console.log(e);
+                        });
+        };
+
+        recognition.onerror = (event) => {
+            console.error(event.error);
+        };
+
+        function voice()
+        {
+            recognition.start();
+        }
+
+        function chat()
+        {
+            var textarea = document.getElementById("chat");
+            var tag = document.createElement("p");
+            tag.innerHTML = document.getElementById("prompt").value;
+            textarea.appendChild(tag);
+           
+
+            const update = {
+                prompt: document.getElementById("prompt").value,
+                };
+
+            const options = {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(update),
+                };
+
+                fetch('http://localhost:3000/api', options)
+                    .then(data => {
+                        if (!data.ok) {
+                            throw Error(data.status);
+                        }
+                        return data.json();
+                        }).then(update => {
+                            var textarea = document.getElementById("chat");
+                            var tag = document.createElement("p");
+                            tag.innerHTML = update;
+                            tag.classList = "bot";
+                            textarea.appendChild(tag);
+
+                            if ('speechSynthesis' in window) {
+                                
+                                // create a new SpeechSynthesisUtterance object
+                                var msg = new SpeechSynthesisUtterance();
+                                
+                                // set the text to be spoken
+                                msg.text = update;
+                                
+                                // speak the text
+                                window.speechSynthesis.speak(msg);
+                                }
+
+                        }).catch(e => {
+                        console.log(e);
+                        });
+
+                        document.getElementById("prompt").value = "";
+
+            return false;
+        }
+
+      
+
+       
+        }
+
+    </script>
+</body>
+</html>
